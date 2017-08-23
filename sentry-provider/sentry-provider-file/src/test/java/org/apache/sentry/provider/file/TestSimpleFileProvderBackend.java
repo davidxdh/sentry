@@ -27,7 +27,6 @@ import java.util.HashSet;
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.sentry.core.common.ActiveRoleSet;
-import org.apache.sentry.core.common.utils.PolicyFiles;
 import org.apache.sentry.provider.common.ProviderBackendContext;
 import org.junit.After;
 import org.junit.Before;

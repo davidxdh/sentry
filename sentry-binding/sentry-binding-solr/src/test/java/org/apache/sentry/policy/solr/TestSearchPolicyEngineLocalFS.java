@@ -22,7 +22,7 @@ import java.io.IOException;
 import org.junit.Assert;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.sentry.core.common.utils.PolicyFiles;
+import org.apache.sentry.provider.file.PolicyFiles;
 
 public class TestSearchPolicyEngineLocalFS extends AbstractTestSearchPolicyEngine {
 

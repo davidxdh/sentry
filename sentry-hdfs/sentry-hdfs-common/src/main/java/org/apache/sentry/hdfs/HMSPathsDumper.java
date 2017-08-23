@@ -105,7 +105,7 @@ public class HMSPathsDumper implements AuthzPathsDumper<HMSPaths> {
     cloneToEntry(tRootEntry, rootEntry, pathDump.getNodeMap(), authzObjToPath,
         pathDump.getDupStringValues(), rootEntry.getType() == EntryType.PREFIX);
     newHmsPaths.setRootEntry(rootEntry);
-    newHmsPaths.setAuthzObjToPathMapping(authzObjToPath);
+    newHmsPaths.setAuthzObjToEntryMapping(authzObjToPath);
 
     return newHmsPaths;
   }

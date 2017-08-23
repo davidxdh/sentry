@@ -28,6 +28,15 @@ public class ServiceConstants {
 
   private static final ImmutableMap<String, String> SASL_PROPERTIES;
 
+  // number used in authz paths and permissions to request initial syncs
+  public static final long SEQUENCE_NUMBER_UPDATE_UNINITIALIZED = -1L;
+
+  // number used in authz paths and permissions to request initial syncs
+  public static final long IMAGE_NUMBER_UPDATE_UNINITIALIZED = 0L;
+
+  // number used in authz paths and permissions that specifies an unused image number
+  public static final long IMAGE_NUMBER_UPDATE_UNUSED = -1L;
+
   static {
     Map<String, String> saslProps = new HashMap<String, String>();
     saslProps.put(Sasl.SERVER_AUTH, "true");
@@ -40,25 +49,12 @@ public class ServiceConstants {
     /**
      * This configuration parameter is only meant to be used for testing purposes.
      */
-    public static final String SENTRY_HDFS_INTEGRATION_PATH_PREFIXES = "sentry.hdfs.integration.path.prefixes";
-    public static final String[] SENTRY_HDFS_INTEGRATION_PATH_PREFIXES_DEFAULT =
-        new String[]{"/user/hive/warehouse"};
-    public static final String SENTRY_HDFS_INIT_UPDATE_RETRY_DELAY_MS = "sentry.hdfs.init.update.retry.delay.ms";
-    public static final int SENTRY_HDFS_INIT_UPDATE_RETRY_DELAY_DEFAULT = 10000;
-    public static final String SENTRY_HDFS_SYNC_CHECKER_PERIOD_MS = "sentry.hdfs.sync.checker.period.ms";
-    public static final int SENTRY_HDFS_SYNC_CHECKER_PERIOD_DEFAULT = 1000;
-    public static final String SENTRY_HDFS_HA_ZOOKEEPER_NAMESPACE = "sentry.hdfs.ha.zookeeper.namespace";
-    public static final String SENTRY_HDFS_HA_ZOOKEEPER_NAMESPACE_DEFAULT = "/sentry_hdfs";
-    public static final String SENTRY_METASTORE_HA_ZOOKEEPER_NAMESPACE = "sentry.metastore.ha.zookeeper.namespace";
-    public static final String SENTRY_METASTORE_HA_ZOOKEEPER_NAMESPACE_DEFAULT = "/sentry_metastore";
     public static final String SENTRY_HDFS_SYNC_METASTORE_CACHE_INIT_THREADS = "sentry.hdfs.sync.metastore.cache.init.threads";
     public static final int SENTRY_HDFS_SYNC_METASTORE_CACHE_INIT_THREADS_DEFAULT = 10;
     public static final String SENTRY_HDFS_SYNC_METASTORE_CACHE_RETRY_MAX_NUM = "sentry.hdfs.sync.metastore.cache.retry.max.num";
     public static final int SENTRY_HDFS_SYNC_METASTORE_CACHE_RETRY_MAX_NUM_DEFAULT = 1;
     public static final String SENTRY_HDFS_SYNC_METASTORE_CACHE_RETRY_WAIT_DURAION_IN_MILLIS = "sentry.hdfs.sync.metastore.cache.retry.wait.duration.millis";
     public static final int SENTRY_HDFS_SYNC_METASTORE_CACHE_RETRY_WAIT_DURAION_IN_MILLIS_DEFAULT = 1000;
-    public static final String SENTRY_HDFS_SYNC_METASTORE_CACHE_FAIL_ON_PARTIAL_UPDATE = "sentry.hdfs.sync.metastore.cache.fail.on.partial.update";
-    public static final boolean SENTRY_HDFS_SYNC_METASTORE_CACHE_FAIL_ON_PARTIAL_UPDATE_DEFAULT = true;
 
     public static final String SENTRY_HDFS_SYNC_METASTORE_CACHE_MAX_PART_PER_RPC = "sentry.hdfs.sync.metastore.cache.max-partitions-per-rpc";
     public static final int SENTRY_HDFS_SYNC_METASTORE_CACHE_MAX_PART_PER_RPC_DEFAULT = 100;
@@ -72,17 +68,13 @@ public class ServiceConstants {
 
     public static final String SECURITY_MODE = "sentry.hdfs.service.security.mode";
     public static final String SECURITY_MODE_KERBEROS = "kerberos";
-    public static final String SECURITY_MODE_NONE = "none";
     public static final String SECURITY_USE_UGI_TRANSPORT = "sentry.hdfs.service.security.use.ugi";
     public static final String PRINCIPAL = "sentry.hdfs.service.server.principal";
 
     public static final String SERVER_RPC_PORT = "sentry.hdfs.service.client.server.rpc-port";
-    public static final int SERVER_RPC_PORT_DEFAULT = 8038;
+  
+    public static final String SERVER_RPC_ADDRESS = "sentry.hdfs.service.client.server.rpc-addresses";
 
-    public static final String SERVER_RPC_ADDRESS = "sentry.hdfs.service.client.server.rpc-address";
-
-    public static final String SERVER_RPC_CONN_TIMEOUT = "sentry.hdfs.service.client.server.rpc-connection-timeout";
-    public static final int SERVER_RPC_CONN_TIMEOUT_DEFAULT = 200000;
     public static final String USE_COMPACT_TRANSPORT = "sentry.hdfs.service.client.compact.transport";
     public static final boolean USE_COMPACT_TRANSPORT_DEFAULT = false;
 

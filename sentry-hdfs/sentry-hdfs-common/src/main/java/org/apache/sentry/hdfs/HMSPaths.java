@@ -241,6 +241,66 @@ public class HMSPaths implements AuthzPaths {
           getFullPath(), type, authzObjs != null ? Joiner.on(",").join(authzObjs) : "");
     }
 
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj) {
+        return true;
+      }
+      if (obj == null) {
+        return false;
+      }
+      if (getClass() != obj.getClass()) {
+        return false;
+      }
+
+      Entry other = (Entry) obj;
+      if (parent == null) {
+        if (other.parent != null) {
+          return false;
+        }
+      } else if (!parent.equals(other.parent)) {
+        return false;
+      }
+
+      if (type == null) {
+        if (other.type != null) {
+          return false;
+        }
+      } else if (!type.equals(other.type)) {
+        return false;
+      }
+
+      if (pathElement == null) {
+        if (other.pathElement != null) {
+          return false;
+        }
+      } else if (!pathElement.equals(other.pathElement)) {
+        return false;
+      }
+
+      if (authzObjs == null) {
+        if (other.authzObjs != null) {
+          return false;
+        }
+      } else if (!authzObjs.equals(other.authzObjs)) {
+        return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + ((parent == null) ? 0 : parent.hashCode());
+      result = prime * result + ((type == null) ? 0 : type.hashCode());
+      result = prime * result + ((pathElement == null) ? 0 : pathElement.hashCode());
+      result = prime * result + ((authzObjs == null) ? 0 : authzObjs.hashCode());
+
+      return result;
+    }
+
     /**
      * Create all missing parent entries for an given entry, and return the parent entry for
      * the entry.
@@ -446,7 +506,7 @@ public class HMSPaths implements AuthzPaths {
     public Entry findPrefixEntry(List<String> pathElements) {
       Preconditions.checkArgument(pathElements != null,
           "pathElements cannot be NULL");
-      return (getType() == EntryType.PREFIX) 
+      return (getType() == EntryType.PREFIX)
              ? this : findPrefixEntry(pathElements, 0);
     }
 
@@ -522,7 +582,10 @@ public class HMSPaths implements AuthzPaths {
 
   // The hive authorized objects to path entries mapping.
   // One authorized object can map to a set of path entries.
-  private Map<String, Set<Entry>> authzObjToPath;
+  private Map<String, Set<Entry>> authzObjToEntries;
+
+  public HMSPaths() {
+  }
 
   public HMSPaths(String[] pathPrefixes) {
     boolean rootPrefix = false;
@@ -542,7 +605,7 @@ public class HMSPaths implements AuthzPaths {
       }
     }
 
-    authzObjToPath = new TreeMap<String, Set<Entry>>(String.CASE_INSENSITIVE_ORDER);
+    authzObjToEntries = new TreeMap<String, Set<Entry>>(String.CASE_INSENSITIVE_ORDER);
   }
 
   void _addAuthzObject(String authzObj, List<String> authzObjPaths) {
@@ -550,7 +613,7 @@ public class HMSPaths implements AuthzPaths {
   }
 
   void addAuthzObject(String authzObj, List<List<String>> authzObjPathElements) {
-    Set<Entry> previousEntries = authzObjToPath.get(authzObj);
+    Set<Entry> previousEntries = authzObjToEntries.get(authzObj);
     Set<Entry> newEntries = new HashSet<Entry>(authzObjPathElements.size());
     for (List<String> pathElements : authzObjPathElements) {
       Entry e = root.createAuthzObjPath(pathElements, authzObj);
@@ -560,7 +623,7 @@ public class HMSPaths implements AuthzPaths {
         LOG.warn("Ignoring path, no prefix");
       }
     }
-    authzObjToPath.put(authzObj, newEntries);
+    authzObjToEntries.put(authzObj, newEntries);
     if (previousEntries != null) {
       previousEntries.removeAll(newEntries);
       if (!previousEntries.isEmpty()) {
@@ -573,7 +636,7 @@ public class HMSPaths implements AuthzPaths {
 
   void addPathsToAuthzObject(String authzObj,
       List<List<String>> authzObjPathElements, boolean createNew) {
-    Set<Entry> entries = authzObjToPath.get(authzObj);
+    Set<Entry> entries = authzObjToEntries.get(authzObj);
     if (entries != null) {
       Set<Entry> newEntries = new HashSet<Entry>(authzObjPathElements.size());
       for (List<String> pathElements : authzObjPathElements) {
@@ -610,7 +673,7 @@ public class HMSPaths implements AuthzPaths {
    */
   void deletePathsFromAuthzObject(String authzObj,
       List<List<String>> authzObjPathElements) {
-    Set<Entry> entries = authzObjToPath.get(authzObj);
+    Set<Entry> entries = authzObjToEntries.get(authzObj);
     if (entries != null) {
       Set<Entry> toDelEntries = new HashSet<Entry>(authzObjPathElements.size());
       for (List<String> pathElements : authzObjPathElements) {
@@ -631,7 +694,7 @@ public class HMSPaths implements AuthzPaths {
   }
 
   void deleteAuthzObject(String authzObj) {
-    Set<Entry> entries = authzObjToPath.remove(authzObj);
+    Set<Entry> entries = authzObjToEntries.remove(authzObj);
     if (entries != null) {
       for (Entry entry : entries) {
         entry.deleteAuthzObject(authzObj);
@@ -703,13 +766,13 @@ public class HMSPaths implements AuthzPaths {
     }
 
     // Re-write authObj from oldName to newName.
-    Set<Entry> entries = authzObjToPath.get(oldName);
+    Set<Entry> entries = authzObjToEntries.get(oldName);
     if (entries == null) {
       LOG.warn("Unexpected state in renameAuthzObject, cannot find oldName in authzObjToPath: " +
           "oldName=" + oldName + " newName=" + newName +
           " oldPath=" + oldPathElems + " newPath=" + newPathElems);
     } else {
-      authzObjToPath.put(newName, entries);
+      authzObjToEntries.put(newName, entries);
       for (Entry e : entries) {
         e.addAuthzObj(newName);
 
@@ -746,8 +809,8 @@ public class HMSPaths implements AuthzPaths {
     this.root = root;
   }
 
-  void setAuthzObjToPathMapping(Map<String, Set<Entry>> mapping) {
-    authzObjToPath = mapping;
+  void setAuthzObjToEntryMapping(Map<String, Set<Entry>> mapping) {
+    authzObjToEntries = mapping;
   }
 
   @Override
